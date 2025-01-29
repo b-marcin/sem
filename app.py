@@ -106,8 +106,24 @@ uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
 if uploaded_file is not None:
     try:
-        # Read the CSV file
-        df = pd.read_csv(uploaded_file)
+        # Read the CSV file with more flexible parsing
+        df = pd.read_csv(
+            uploaded_file,
+            on_bad_lines='warn',  # Warn about problematic lines
+            skipinitialspace=True,  # Skip spaces after delimiter
+            sep=None,  # Detect separator automatically
+            engine='python'  # More flexible python engine
+        )
+        
+        # Display CSV parsing information
+        st.subheader("CSV File Information")
+        st.write(f"Number of columns: {len(df.columns)}")
+        st.write("Column names:", list(df.columns))
+        
+        # Check for problematic columns
+        if df.columns.duplicated().any():
+            st.warning("Warning: Duplicate column names detected!")
+            st.write("Duplicate columns:", df.columns[df.columns.duplicated()].tolist())
         
         # Show data preview
         st.subheader("Data Preview")
